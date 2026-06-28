@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teorema del Mono Infinito</title>
+
+<style>
+body{
+    margin:0;
+    background:#111;
+    color:white;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+header{
+    background:#1e1e1e;
+    padding:20px;
+    text-align:center;
+    font-size:30px;
+    font-weight:bold;
+}
+
+.panel{
+    padding:20px;
+}
+
+input{
+    padding:10px;
+    border-radius:8px;
+    border:none;
+    width:120px;
+    margin:5px;
+}
+
+button{
+    padding:10px 20px;
+    margin:5px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+    background:#0a84ff;
+    color:white;
+}
+
+button:hover{
+    background:#3399ff;
+}
+
+#salida{
+    margin-top:20px;
+    height:350px;
+    overflow:auto;
+    background:#202020;
+    border-radius:10px;
+    padding:15px;
+    white-space:pre-wrap;
+    word-break:break-word;
+    font-family:monospace;
+    font-size:18px;
+}
+
+.resaltado{
+    background:yellow;
+    color:black;
+    font-weight:bold;
+}
+
+.stats{
+    display:flex;
+    flex-wrap:wrap;
+    gap:20px;
+    margin-top:20px;
+}
+
+.card{
+    background:#222;
+    padding:10px;
+    border-radius:8px;
+    min-width:140px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+🐒 Teorema del Mono Infinito
+</header>
+
+<div class="panel">
+
+<label>Palabra:</label><br>
+<input id="palabra" value="HOLA">
+
+<br>
+
+<label>Caracteres por ciclo:</label><br>
+<input id="cantidad" type="number" value="100">
+
+<br>
+
+<label>Velocidad (ms):</label><br>
+<input id="velocidad" type="number" value="20">
+
+<br><br>
+
+<button onclick="iniciar()">▶ Iniciar</button>
+<button onclick="detener()">⏸ Pausar</button>
+<button onclick="reiniciar()">🔄 Reiniciar</button>
+
+<div class="stats">
+
+<div class="card">
+Caracteres
+<br>
+<span id="contador">0</span>
+</div>
+
+<div class="card">
+Coincidencias
+<br>
+<span id="coincidencias">0</span>
+</div>
+
+<div class="card">
+Tiempo
+<br>
+<span id="tiempo">0 s</span>
+</div>
+
+</div>
+
+<div id="salida"></div>
+
+</div>
+
+<script>
+
+const alfabeto =
+"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ";
+
+let texto = "";
+let caracteres = 0;
+let coincidencias = 0;
+let intervalo = null;
+let cronometro = null;
+let segundos = 0;
+function generar(){
+
+    let cantidad = Number(document.getElementById("cantidad").value);
+
+    for(let i=0;i<cantidad;i++){
+
+        texto += alfabeto[Math.floor(Math.random()*alfabeto.length)];
+
+    }
+
+    caracteres += cantidad;
+
+    let palabra = document.getElementById("palabra").value;
+
+    let mostrar = texto;
+
+    if(palabra.length>0){
+
+        let expresion = new RegExp(palabra,"gi");
+
+        let antes = (mostrar.match(expresion)||[]).length;
+
+        coincidencias = antes;
+
+        mostrar = mostrar.replace(expresion,function(x){
+
+            return "<span class='resaltado'>"+x+"</span>";
+
+        });
+
+    }
+
+    if(mostrar.length>30000){
+
+        mostrar = mostrar.slice(-30000);
+
+    }
+  document.getElementById("salida").innerHTML = mostrar;
+
+// Buscar todas las palabras resaltadas
+const resaltados = document.querySelectorAll(".resaltado");
+
+// Si existe al menos una, mover la pantalla hasta la última
+if (resaltados.length > 0) {
+
+    resaltados[resaltados.length - 1].scrollIntoView({
+
+        behavior: "smooth",
+
+        block: "center"
+
+    });
+
+}
+document.getElementById("contador").innerHTML = caracteres;
+
+    document.getElementById("coincidencias").innerHTML = coincidencias;
+
+    document.getElementById("salida").scrollTop =
+    document.getElementById("salida").scrollHeight;
+
+}
+
+function iniciar(){
+
+    detener();
+
+    let velocidad =
+    Number(document.getElementById("velocidad").value);
+
+    intervalo = setInterval(generar,velocidad);
+
+    cronometro = setInterval(function(){
+
+        segundos++;
+
+        document.getElementById("tiempo").innerHTML =
+        segundos+" s";
+
+    },1000);
+
+}
+
+function detener(){
+
+    clearInterval(intervalo);
+
+    clearInterval(cronometro);
+
+}
+
+function reiniciar(){
+
+    detener();
+
+    texto="";
+
+    caracteres=0;
+
+    coincidencias=0;
+
+    segundos=0;
+
+    document.getElementById("salida").innerHTML="";
+
+    document.getElementById("contador").innerHTML="0";
+
+    document.getElementById("coincidencias").innerHTML="0";
+
+    document.getElementById("tiempo").innerHTML="0 s";
+
+}
+
+</script>
+
+</body>
+</html>
